@@ -60,27 +60,36 @@ public class Minesweeper {
 		while (hasNextRound) {
 			board.show();
 			String input = input("\nPlease enter your move (row col): ");
-			switch (input) {
-				case "top":
-					ranking.show();
-					break;
-				case "restart":
-					ranking.recordName(result);
-					hasNextRound = false;
-					break;
-				case "exit":
-					ranking.recordName(result);
-					hasNextRound = false;
-					shouldStartAgain = false;
-					break;
-				default:
-					processCoordinateInput(input);
-					break;
+			boolean isCommand = processCommandInput(input);
+			if (!isCommand) {
+				processCoordinateInput(input);
 			}
 		}
-
-
 		return shouldStartAgain;
+	}
+
+	/**
+	 * Try to parse the input string, and perform the action if it is a command.
+	 * @param input The input string typed by the user.
+	 * @return {@code true} if the input was processed, {@code false} if not.
+	 */
+	private boolean processCommandInput(String input) {
+		switch (input) {
+			case "top":
+				ranking.show();
+				return true;
+			case "restart":
+				ranking.recordName(result);
+				hasNextRound = false;
+				return true;
+			case "exit":
+				ranking.recordName(result);
+				hasNextRound = false;
+				shouldStartAgain = false;
+				return true;
+			default:
+				return false;
+		}
 	}
 
 	private void processCoordinateInput(String input) {
