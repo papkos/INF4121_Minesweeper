@@ -2,66 +2,22 @@ import java.util.Scanner;
 
 public class Minesweeper {
 
-	private static Ranking rank;
-
-	private static boolean continueGame = true;
-
 	public static void main(String[] args) {
-		rank = new Ranking();
-		mainMessage();
+		Ranking ranking = new Ranking();
 
-		while (continueGame) {
-			gameLoop();
+		printMainMessage();
+
+		Minesweeper game;
+		boolean hasNextGame = true;
+		while (hasNextGame) {
+			game = new Minesweeper(ranking);
+			hasNextGame = game.play();
 		}
 
 		System.out.println("\nThank you for playing :) Have a nice day!");
 	}
 
-	private static void gameLoop() {
-		MineField field = new MineField();
-		int result = 0;
-		boolean playing = true;
-
-		while (playing) {
-			field.show();
-			System.out.print("\nPlease enter your move (row col): ");
-			Scanner in = new Scanner(System.in);
-			String input = in.nextLine();
-
-			switch (input) {
-				case "top":
-					rank.show();
-					break;
-				case "restart":
-					rank.recordName(result);
-					playing = false;
-					break;
-				case "exit":
-					rank.recordName(result);
-					playing = false;
-					continueGame = false;
-					break;
-				default: {
-					if (field.legalMoveString(input)) {
-						result++;
-						if (result == 35) {
-							System.out.println("Congratulations you WON the game!");
-							rank.recordName(result);
-							playing = false;
-						}
-					} else if (field.getBoom()) {
-						System.out.println("\nBooooooooooooooooooooooooooooom! You stepped on a mine! " +
-								"You survived " + result + " turns");
-						rank.recordName(result);
-						playing = false;
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	private static void mainMessage() {
+	private static void printMainMessage() {
 		System.out.println("Welcome to Minesweeper!");
 		System.out.println("To play just input some coordinates and try not to step on a mine :)");
 		System.out.println("Useful commands:");
@@ -70,4 +26,77 @@ public class Minesweeper {
 		System.out.println("top - Reveals the top scoreboard.");
 		System.out.println("Have Fun !");
 	}
+
+	private static String input() {
+		Scanner in = new Scanner(System.in);
+		return in.nextLine();
+	}
+
+	private static String input(String message) {
+		if (! message.endsWith(" ") && ! message.endsWith("\t")) {
+			message = message + " ";
+		}
+		System.out.print(message);
+		return input();
+	}
+
+	private final Ranking ranking;
+	private final MineField board;
+	private int result = 0;
+
+	private boolean shouldStartAgain;
+	private boolean hasNextRound;
+
+	public Minesweeper(Ranking ranking) {
+		this.ranking = ranking;
+
+		this.board = new MineField();
+	}
+
+	public boolean play() {
+		shouldStartAgain = true;
+		hasNextRound = true;
+
+		while (hasNextRound) {
+			board.show();
+			String input = input("\nPlease enter your move (row col): ");
+			switch (input) {
+				case "top":
+					ranking.show();
+					break;
+				case "restart":
+					ranking.recordName(result);
+					hasNextRound = false;
+					break;
+				case "exit":
+					ranking.recordName(result);
+					hasNextRound = false;
+					shouldStartAgain = false;
+					break;
+				default:
+					processCoordinateInput(input);
+					break;
+			}
+		}
+
+
+		return shouldStartAgain;
+	}
+
+	private void processCoordinateInput(String input) {
+		if (board.legalMoveString(input)) {
+			result++;
+			if (result == 35) {
+				System.out.println("Congratulations you WON the game!");
+				ranking.recordName(result);
+				hasNextRound = false;
+			}
+		} else if (board.getBoom()) {
+			System.out.println("\nBooooooooooooooooooooooooooooom! You stepped on a mine! " +
+					"You survived " + result + " turns");
+			ranking.recordName(result);
+			hasNextRound = false;
+		}
+	}
+
 }
