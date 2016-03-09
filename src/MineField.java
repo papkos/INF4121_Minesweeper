@@ -14,12 +14,7 @@ class MineField {
 		visible = new boolean[ROWS][COLS];
 		boom = false;
 
-		for (int row = 0; row < ROWS; row++) {
-			for (int col = 0; col < COLS; col++) {
-				mines[row][col] = false;
-				visible[row][col] = false;
-			}
-		}
+		initField();
 
 		int counter2 = 15;
 		Random RGenerator = new Random();
@@ -29,6 +24,15 @@ class MineField {
 			placed = placeMine(new Coord(RGenerator.nextInt(ROWS), RGenerator.nextInt(COLS)));
 			if (placed) {
 				counter2--;
+			}
+		}
+	}
+
+	private void initField() {
+		for (int row = 0; row < ROWS; row++) {
+			for (int col = 0; col < COLS; col++) {
+				mines[row][col] = false;
+				visible[row][col] = false;
 			}
 		}
 	}
