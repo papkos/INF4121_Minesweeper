@@ -1,15 +1,16 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Scanner;
 
 public class Ranking {
 
 	private final int MAX_PEOPLE_LIMIT = 5;
-	private String[] name;
-	private int[] record;
+	private List<Record> records;
 	private int last;
 
 	Ranking() {
-		name = new String[MAX_PEOPLE_LIMIT];
-		record = new int[MAX_PEOPLE_LIMIT];
+		records = new ArrayList<>(MAX_PEOPLE_LIMIT);
 
 		last = 0;
 	}
@@ -18,15 +19,13 @@ public class Ranking {
 		System.out.print("\n Please enter your name -");
 		Scanner in = new Scanner(System.in);
 		String newName = in.nextLine();
-		if ((last == MAX_PEOPLE_LIMIT) && record[MAX_PEOPLE_LIMIT - 1] > result) {
+		if ((last == MAX_PEOPLE_LIMIT) && records.get(MAX_PEOPLE_LIMIT - 1).score > result) {
 			System.out.println("\nSorry you cannot enter top " + (MAX_PEOPLE_LIMIT) + " players");
 			return;
 		} else if (last == MAX_PEOPLE_LIMIT) {
-			name[MAX_PEOPLE_LIMIT - 1] = newName;
-			record[MAX_PEOPLE_LIMIT - 1] = result;
+			records.set(MAX_PEOPLE_LIMIT - 1, new Record(newName, result));
 		} else {
-			name[last] = newName;
-			record[last] = result;
+			records.add(new Record(newName, result));
 			last++;
 		}
 
@@ -39,30 +38,30 @@ public class Ranking {
 			System.out.println("Still no results");
 			return;
 		}
-		System.out.println("N Name\t\tresult");
-		for (int i = 0; i < last; i++) {
-			System.out.println((i + 1) + " " + name[i] + "\t" + record[i]);
+		System.out.println(String.format("%1$2s. %2$-10s\t%3$s", "N", "Name", "Score"));
+		for (int i = 0; i < records.size(); i++) {
+			Record record = records.get(i);
+			System.out.println(String.format("%1$2d. %2$-10s\t%3$s", i + 1, record.name, record.score));
 		}
 	}
 
 	private void sort() {
-		if (last < 2) {
-			return;
+		// Sort by score, descending.
+		Collections.sort(records, (r1, r2) -> r2.score - r1.score);
+	}
+
+	static class Record {
+		public final String name;
+		public final int score;
+
+		public Record(String name, int score) {
+			this.name = name;
+			this.score = score;
 		}
-		boolean unsorted = true;
-		while (unsorted) {
-			unsorted = false;
-			for (int i = 0; i < (last - 1); i++) {
-				if (record[i + 1] > record[i]) {
-					int swapR = record[i];
-					record[i] = record[i + 1];
-					record[i + 1] = swapR;
-					String swapN = name[i];
-					name[i] = name[i + 1];
-					name[i + 1] = swapN;
-					unsorted = true;
-				}
-			}
+
+		@Override
+		public String toString() {
+			return String.format("%1$-10s\t%2$s", name, score);
 		}
 	}
 }
