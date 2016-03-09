@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.util.function.Consumer;
 
 class MineField {
 
@@ -15,26 +16,27 @@ class MineField {
 		boom = false;
 
 		initField();
+		populateMines();
+	}
 
-		int counter2 = 15;
+	private void populateMines() {
+		int minesLeft = 15;
 		Random RGenerator = new Random();
-		boolean placed;
 
-		while (counter2 > 0) {
-			placed = placeMine(new Coord(RGenerator.nextInt(ROWS), RGenerator.nextInt(COLS)));
-			if (placed) {
-				counter2--;
+		while (minesLeft > 0) {
+			Coord coord = new Coord(RGenerator.nextInt(ROWS), RGenerator.nextInt(COLS));
+			if (! mines[coord.row][coord.col]) {
+				mines[coord.row][coord.col] = true;
+				minesLeft--;
 			}
 		}
 	}
 
 	private void initField() {
-		for (int row = 0; row < ROWS; row++) {
-			for (int col = 0; col < COLS; col++) {
-				mines[row][col] = false;
-				visible[row][col] = false;
-			}
-		}
+		iterate(coord -> {
+			mines[coord.row][coord.col] = false;
+			visible[coord.row][coord.col] = false;
+		});
 	}
 
 	/**
@@ -56,13 +58,11 @@ class MineField {
 	 * Make all mine positions visible.
  	 */
 	private void revealMines() {
-		for (int row = 0; row < ROWS; row++) {
-			for (int col = 0; col < COLS; col++) {
-				if (mines[row][col]) {
-					visible[row][col] = true;
-				}
+		iterate(coord -> {
+			if (mines[coord.row][coord.col]) {
+				visible[coord.row][coord.col] = true;
 			}
-		}
+		});
 	}
 
 	public boolean getBoom() {
@@ -180,6 +180,14 @@ class MineField {
 	 */
 	private boolean checkWithinBounds(int row, int col) {
 		return col >= 0 && col < COLS && row >= 0 && row < ROWS;
+	}
+
+	public void iterate(Consumer<Coord> fn) {
+		for (int row = 0; row < ROWS; row++) {
+			for (int col = 0; col < COLS; col++) {
+				fn.accept(new Coord(row, col));
+			}
+		}
 	}
 
 	/**
