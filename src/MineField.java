@@ -182,6 +182,12 @@ class MineField {
 		return col >= 0 && col < COLS && row >= 0 && row < ROWS;
 	}
 
+	/**
+	 * Iterates over all of the cells on the board, and applies the function to each of them.
+	 * @param fn The callable to apply on each cell. Has only one parameter, of type {@link Coord},
+	 *           and should not return anything.
+	 *           Can be a lambda expression.
+	 */
 	public void iterate(Consumer<Coord> fn) {
 		for (int row = 0; row < ROWS; row++) {
 			for (int col = 0; col < COLS; col++) {
